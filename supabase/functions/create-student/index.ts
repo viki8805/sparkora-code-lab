@@ -1,0 +1,13 @@
+import {serve} from 'https://deno.land/std@0.224.0/http/server.ts';
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+const headers={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Content-Type':'application/json'};
+serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{headers});if(req.method!=='POST')return new Response(JSON.stringify({error:'Method not allowed'}),{status:405,headers});
+ const url=Deno.env.get('SUPABASE_URL')!;const anon=Deno.env.get('SUPABASE_ANON_KEY')!;const service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+ const bearer=req.headers.get('Authorization')??'';const userClient=createClient(url,anon,{global:{headers:{Authorization:bearer}}});const {data:{user},error:authError}=await userClient.auth.getUser();if(authError||!user)return new Response(JSON.stringify({error:'Unauthorized'}),{status:401,headers});
+ const admin=createClient(url,service);const {data:teacher}=await admin.from('teachers').select('id').eq('profile_id',user.id).maybeSingle();if(!teacher)return new Response(JSON.stringify({error:'Teacher role required'}),{status:403,headers});
+ let body;try{body=await req.json()}catch{return new Response(JSON.stringify({error:'Invalid JSON'}),{status:400,headers})}
+ const {full_name,username,email,password,grade,days}=body;
+ if(typeof full_name!=='string'||full_name.trim().length<2||typeof username!=='string'||!/^[a-zA-Z0-9_]{3,30}$/.test(username)||typeof email!=='string'||!/^\S+@\S+\.\S+$/.test(email)||typeof password!=='string'||password.length<8||!Number.isInteger(grade)||grade<1||grade>8||!Number.isInteger(days)||days<1||days>365)return new Response(JSON.stringify({error:'Invalid student details'}),{status:400,headers});
+ const {data:created,error:createError}=await admin.auth.admin.createUser({email,password,email_confirm:true});if(createError||!created.user)return new Response(JSON.stringify({error:createError?.message??'Could not create account'}),{status:400,headers});
+ const id=created.user.id;try{const {error:e1}=await admin.from('profiles').insert({id,full_name:full_name.trim(),username,role:'student'});if(e1)throw e1;const {data:s,error:e2}=await admin.from('students').insert({profile_id:id,teacher_id:teacher.id,grade}).select('id').single();if(e2)throw e2;const {error:e3}=await admin.from('student_access').insert({student_id:s.id,status:'active',starts_at:new Date().toISOString(),expires_at:new Date(Date.now()+days*86400000).toISOString()});if(e3)throw e3;return new Response(JSON.stringify({ok:true}),{status:200,headers})}catch(e){await admin.auth.admin.deleteUser(id);return new Response(JSON.stringify({error:String(e)}),{status:400,headers})}
+});

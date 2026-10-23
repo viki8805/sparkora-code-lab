@@ -1,0 +1,155 @@
+.explain-container {
+  margin-top: 25px;
+  padding: 28px;
+  background: #f0fdfa;
+  border: 2px solid #99f6e4;
+  border-radius: 24px;
+  text-align: center;
+}
+
+.explain-container h2 {
+  color: #0f766e;
+  font-size: 26px;
+}
+
+.explain-btn,
+.next-step-btn {
+  background: #14b8a6;
+  color: white;
+  border: none;
+  padding: 13px 25px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 15px 8px;
+}
+
+.explain-btn:hover,
+.next-step-btn:hover {
+  background: #0d9488;
+}
+
+.token-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.token-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 80px;
+  padding: 16px;
+  background: white;
+  border: 2px solid #99f6e4;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: tokenAppear 0.5s ease both;
+}
+
+.token-box span {
+  font-size: 25px;
+}
+
+.token-box strong {
+  color: #164e63;
+  font-family: monospace;
+}
+
+.token-box:hover {
+  transform: translateY(-5px);
+}
+
+.active-token {
+  background: #ccfbf1;
+  border-color: #0d9488;
+  transform: scale(1.1);
+  box-shadow: 0 8px 22px #14b8a633;
+}
+
+.magic-explanation {
+  padding: 25px;
+  margin: 20px auto;
+  max-width: 450px;
+  background: white;
+  border-radius: 20px;
+  border: 2px solid #a7f3d0;
+  animation: tokenAppear 0.5s ease;
+}
+
+.magic-emoji {
+  font-size: 55px;
+  animation: bounce 1.5s infinite;
+}
+
+.magic-explanation h3 {
+  color: #0f766e;
+  font-size: 24px;
+}
+
+.magic-explanation p {
+  color: #334155;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.magic-box-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 55px;
+  animation: bounce 1.5s infinite;
+}
+
+.magic-box-animation span {
+  font-size: 15px;
+  font-weight: bold;
+  color: #0f766e;
+}
+
+.complete-message {
+  margin-top: 15px;
+  font-size: 18px;
+  color: #059669;
+  font-weight: bold;
+}
+
+@keyframes tokenAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (max-width: 600px) {
+  .explain-container {
+    padding: 15px;
+  }
+
+  .token-box {
+    min-width: 65px;
+    padding: 12px;
+  }
+}
